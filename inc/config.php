@@ -1,15 +1,15 @@
 <?php
 
-/* $DBhost ="localhost";
+$DBhost ="localhost";
 $DBuser ="root";
 $DBpassword ="";
-$DBName= "webchat"; */
-
+$DBName= "webchat";
+/* 
 $DBhost ="localhost";
 $DBuser ="uvzgnrcjcpl3g";
 $DBpassword ="Chiccopiccinini2005!";
 $DBName= "dboxfiaapnbn3h";
-
+ */
 $conn = new mysqli($DBhost,$DBuser,$DBpassword,$DBName);
 
 if($conn->connect_error)
