@@ -249,4 +249,42 @@ class UtenteBL
 
         $stmt->close();
     }
+
+
+    public function GetConversationsByIDUser($userId)
+    {
+        $query = "SELECT pa.*
+        FROM partecipare AS pa
+        JOIN conversazioni AS co ON co.ID = pa.IDConversazione
+        WHERE co.ID IN(
+            SELECT c.ID
+            FROM conversazioni AS c
+            JOIN partecipare AS p ON p.IDConversazione = c.ID
+            JOIN utenti AS a ON a.ID = p.IDUtente
+            WHERE a.ID = 11)";
+
+        $stmt = $this->conn->prepare($query);
+
+        if ($stmt === false) {
+            return json_encode(['error' => "Error preparing statement: " . $this->conn->error]);
+        }
+
+        $stmt->bind_param("i", $userId);
+
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+
+            // Fetch user data
+            if ($row = $result->fetch_assoc()) {
+                return json_encode(['success' => $row]);
+            } else {
+                return json_encode(['error' => "User with ID $userId not found."]);
+            }
+        } else {
+            return json_encode(['error' => "Error executing statement: " . $stmt->error]);
+        }
+
+        $stmt->close();
+    }
+
 }

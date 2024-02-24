@@ -37,6 +37,36 @@ function FetchPost(path, body, callback) {
 
 //LOAD JSON POST
 
+function LoadMyChats() {
+  let body = { SearchText: text };
+
+  FetchPost("inc/search.inc.php", body, function (data, error) {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    document.getElementById("my-chats").innerHTML = "";
+
+    data.forEach(function (user) {
+      document.getElementById("my-chats").innerHTML += `
+        <a href="profile.php?user=${user.username}" class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+              <img class="img-fluid rounded-circle" src="${user.img}" alt="user img" style="width: 50px; height: 50px;">
+              <span class="active"></span>
+          </div>
+          <div class="flex-grow-1 ms-3">
+              <h3>${user.username}</h3>
+              <p>${user.Nome} ${user.Cognome}</p>
+          </div>
+        </a>
+      `;
+    });
+  });
+}
+
+
+
 function caricaJsonPost(text) {
   let body = { SearchText: text };
 
@@ -83,7 +113,8 @@ function CaricaChattingUser() {
 
       if (response.error) {
         // Display the error message
-        userProfileElement.innerHTML = `<p>Error: ${response.error}</p>`;
+        /* userProfileElement.innerHTML = `<p>Error: ${response.error}</p>`; */
+        console.log(response.error);
       } else if (response.success) {
         // Extract user data from success response
         const userData = response.success;
@@ -167,6 +198,81 @@ function SendMessage() {
 
 /* FETCH MESSAGES */
 
+function FetchMessagesInRange() {
+  const path = "inc/testing.php";
+  const body = {"date1":"2024-02-21","date2":"2025-12-01"}; // No body required for this request
+
+  // Callback function to handle the response
+  const callback = function (response, error) {
+    if (error) {
+      // Handle errors or other responses here
+      console.error("Request failed:", error);
+    } else {
+      console.log(response); // Log the response text
+
+      /* taking the ul where I'm going to append all the messages */
+      let messagesBody = document.getElementById("msg-body-list");
+
+      // Check if the response indicates success
+      if (response.success) {
+        let messagesData = response.success;
+        let idSender = response.IDSender;
+
+        console.log(idSender);
+        console.log(messagesData);
+
+        messagesData.forEach(function (element) {
+          // Create a new li element
+          var li = document.createElement("li");
+
+          // Create new elements for the message
+          var p = document.createElement("p");
+          var span = document.createElement("span");
+
+          if (element.IDUtente == idSender) {
+            li.className = "sender";
+          } else {
+            li.className = "repaly";
+          }
+
+          // Set text content of the circle (you can customize this)
+          p.textContent = element.Contenuto;
+          span.textContent = element.DataCreazione;
+
+          span.className = "time";
+
+          // Append circle to li
+          li.appendChild(p);
+          li.appendChild(span);
+
+          // Append li to ul
+          messagesBody.appendChild(li);
+        });
+      }
+      else {
+        //if I have no one to chat with
+
+        let bodyMessages = document.getElementById("body-of-messages");
+
+        bodyMessages.innerHTML = "";
+
+        bodyMessages.innerHTML = `
+          <div class="d-flex justify-content-center align-items-center style="height:100%;width:100%;">
+            <p>
+              start chatting with someone
+            </p>
+          </div>
+      `;
+
+      }
+    }
+  };
+
+  // Make the POST request using FetchPost
+  FetchPost(path, body, callback);
+}
+
+
 function FetchMessages() {
   const path = "inc/fetchMessages.inc.php";
   const body = {}; // No body required for this request
@@ -218,6 +324,22 @@ function FetchMessages() {
           messagesBody.appendChild(li);
         });
       }
+      else {
+        //if I have no one to chat with
+
+        let bodyMessages = document.getElementById("body-of-messages");
+
+        bodyMessages.innerHTML = "";
+
+        bodyMessages.innerHTML = `
+          <div class="d-flex justify-content-center align-items-center style="height:100%;width:100%;">
+            <p>
+              start chatting with someone
+            </p>
+          </div>
+      `;
+
+      }
     }
   };
 
@@ -268,3 +390,4 @@ function LoadUserProfile() {
   // Make the POST request using FetchPost
   FetchPost(path, body, callback);
 }
+
