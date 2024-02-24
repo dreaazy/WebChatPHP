@@ -250,18 +250,24 @@ class UtenteBL
         $stmt->close();
     }
 
-
-    public function GetConversationsByIDUser($userId)
+    //restituisce gli id degli utenti che hanno una conversazione aperta (partecipano ad una conversazione) con un utente (ID dell'utente loggato)
+    public function GetUsersOfOpenChats($userId)
     {
-        $query = "SELECT pa.*
-        FROM partecipare AS pa
-        JOIN conversazioni AS co ON co.ID = pa.IDConversazione
-        WHERE co.ID IN(
-            SELECT c.ID
-            FROM conversazioni AS c
-            JOIN partecipare AS p ON p.IDConversazione = c.ID
-            JOIN utenti AS a ON a.ID = p.IDUtente
-            WHERE a.ID = 11)";
+        $query = "SELECT ut.*
+              FROM (
+                  SELECT pa.IDUtente AS IDUtente
+                  FROM partecipare AS pa
+                  JOIN conversazioni AS co ON co.ID = pa.IDConversazione
+                  WHERE co.ID IN (
+                      SELECT c.ID
+                      FROM conversazioni AS c
+                      JOIN partecipare AS p ON p.IDConversazione = c.ID
+                      JOIN utenti AS a ON a.ID = p.IDUtente
+                      WHERE a.ID = ?
+                  )
+              ) AS UserConversation
+              JOIN utenti AS ut ON ut.ID = UserConversation.IDUtente
+              WHERE UserConversation.IDUtente <> ?";
 
         $stmt = $this->conn->prepare($query);
 
@@ -269,16 +275,20 @@ class UtenteBL
             return json_encode(['error' => "Error preparing statement: " . $this->conn->error]);
         }
 
-        $stmt->bind_param("i", $userId);
+        $stmt->bind_param("ii", $userId, $userId);
 
         if ($stmt->execute()) {
             $result = $stmt->get_result();
+            $users = [];
 
-            // Fetch user data
-            if ($row = $result->fetch_assoc()) {
-                return json_encode(['success' => $row]);
+            while ($row = $result->fetch_assoc()) {
+                $users[] = $row;
+            }
+
+            if (!empty($users)) {
+                return json_encode(['success' => $users]);
             } else {
-                return json_encode(['error' => "User with ID $userId not found."]);
+                return json_encode(['error' => "No open chats found for user $userId"]);
             }
         } else {
             return json_encode(['error' => "Error executing statement: " . $stmt->error]);
@@ -286,5 +296,4 @@ class UtenteBL
 
         $stmt->close();
     }
-
 }

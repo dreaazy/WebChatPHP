@@ -2,7 +2,7 @@
 
 $DBhost ="localhost";
 $DBuser ="root";
-$DBpassword ="root";
+$DBpassword ="";
 $DBName= "webchat";
 /* 
 $DBhost ="localhost";

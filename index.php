@@ -264,6 +264,9 @@ if (isset($_SESSION["user_id"])) {
     <script>
         // Check if the user is chatting with someone
         document.addEventListener("DOMContentLoaded", function () {
+
+            LoadMyChats();
+
             // Show loading indicator
             document.getElementById("loading").style.display = "block";
 

@@ -38,17 +38,19 @@ function FetchPost(path, body, callback) {
 //LOAD JSON POST
 
 function LoadMyChats() {
-  let body = { SearchText: text };
+  let body = {};
 
-  FetchPost("inc/search.inc.php", body, function (data, error) {
+  FetchPost("inc/testingMyChats.php", body, function (data, error) {
     if (error) {
       console.error(error);
       return;
     }
 
     document.getElementById("my-chats").innerHTML = "";
+    let users = data.success;
+    
 
-    data.forEach(function (user) {
+    users.forEach(function (user) {
       document.getElementById("my-chats").innerHTML += `
         <a href="profile.php?user=${user.username}" class="d-flex align-items-center">
           <div class="flex-shrink-0">
