@@ -76,6 +76,56 @@ class MessaggioBL
         }
     }
 
+    
+    public function CheckIfNewMessages($conversationID, $LastMessageDate)
+    {
+        $query = "SELECT COUNT(m.ID) AS NewMessages, MAX(m.DataCreazione) AS LastMessage
+        FROM conversazioni AS c
+        JOIN messaggi AS m ON m.IDConversazione = c.ID
+        WHERE C.ID = ? AND m.DataCreazione > STR_TO_DATE(?, '%Y-%m-%d')
+        ";
+
+        $stmt = $this->conn->prepare($query);
+
+        if ($stmt === false) {
+            return json_encode(['error' => "Error preparing statement: " . $this->conn->error]);
+        }
+
+        // Assuming $conversationID is an integer and $date1, $date2 are dates
+        $stmt->bind_param("is", $conversationID, $LastMessageDate);
+
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+
+            $NMessages = $row["NewMessages"];
+            $LastMessDate = $row["LastMessage"];
+            
+            if($NMessages != 0)
+            {
+                $response = [
+                    'success' => [
+                        'newMessages' => $NMessages,
+                        'lastMessageDate' => $LastMessDate
+                    ]
+                ];
+
+                return json_encode($response);
+            }
+            else
+            {
+                return json_encode(['error' => "no new messages"]);
+            }
+
+            $stmt->close(); // Close the statement here
+
+            
+        } else {
+            $stmt->close(); // Close the statement in case of an error
+            return json_encode(['error' => "Error executing statement: " . $stmt->error]);
+        }
+    }
+
     // Retrieve messages by conversation ID
     public function GetMessagesByConversationID($conversationID)
     {

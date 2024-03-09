@@ -201,7 +201,7 @@ function SendMessage() {
 /* FETCH MESSAGES */
 
 function FetchMessagesInRange() {
-  const path = "inc/testing.php";
+  const path = "inc/fetchMessagesBetweenTwoDates.inc.php";
   const body = {"date1":"2024-02-21","date2":"2025-12-01"}; // No body required for this request
 
   // Callback function to handle the response
