@@ -98,7 +98,8 @@ function caricaJsonPost(text) {
 }
 
 function CaricaChattingUser() {
-  const path = "inc/loadChattingUser.inc.php";
+  /* const path = "inc/loadChattingUser.inc.php"; */
+  const path = "ws/user/search.php?for=username&exact=false";
   const body = {}; // No body required for this request
 
   // Callback function to handle the response
