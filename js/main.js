@@ -34,6 +34,27 @@ function FetchPost(path, body, callback) {
 
   xhttp.send(bodyreq);
 }
+/* do a fetch get with call back */
+function FetchGet(path, callback) {
+  const xhttp = new XMLHttpRequest();
+
+  xhttp.open("GET", path, true);
+
+  xhttp.onreadystatechange = function () {
+    if (this.readyState === 4) {
+      if (this.status === 200) {
+        const rsp = this.responseText;
+        const obj = JSON.parse(rsp);
+        callback(obj);
+      } else {
+        callback(null, new Error("Request failed"));
+      }
+    }
+  };
+
+  xhttp.send();
+}
+
 
 //LOAD JSON POST
 
@@ -99,7 +120,10 @@ function caricaJsonPost(text) {
 
 function CaricaChattingUser() {
   /* const path = "inc/loadChattingUser.inc.php"; */
-  const path = "ws/user/search.php?for=username&exact=false";
+
+  console.log("action");
+
+  const path = "rqst/rqstUsers.php?f=search";
   const body = {}; // No body required for this request
 
   // Callback function to handle the response
@@ -160,7 +184,7 @@ function CaricaChattingUser() {
   };
 
   // Make the POST request using FetchPost
-  FetchPost(path, body, callback);
+  FetchGet(path, callback);
 }
 
 //SEND MESSAGE

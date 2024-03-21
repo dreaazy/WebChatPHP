@@ -1,161 +1,57 @@
 <?php
-// Un FILE per ogni entità per richiamare i metodi del WEBSERVICES
-
 require_once __DIR__ . "/../inc/utilities.inc.php";
 
-echo $WSURI;
+global $WSURI;
 
-function SearchUser($user, $libro)
-{
-    global $WSURI;
-	$wsRemotePath =  $WSURI . "/libri/screate.php";
+$wsRemotePath =  $WSURI . "/ws/user/usertry.php";
 
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        ),
-        "object" => array(
-            "ID" => $libro->ID,
-            "ISBN" => $libro->ISBN,
-            "Autore" => $libro->Autore,
-            "Titolo" => $libro->Titolo,
-            "Prezzo" => $libro->Prezzo
-        )
-    );
+$filtri = array(
+    "user" => array(
+        "Email" => "ciao",
+        "Token" => "caio"
+    )
+);
 
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
 
-    $libro = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    // var_dump ($libro);
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-    return $libro;
+    if (isset($_GET["f"])) {
+        $function = $_GET["f"];
+
+
+
+        switch ($function) {
+            case "search":
+
+                $response = WsRequest($wsRemotePath, $filtri);
+                echo json_encode(['error' => $response]);
+                break;
+        }
+    }
 }
 
+/* // Make the request
+$response = WsRequest($wsRemotePath, $filtri);
 
-function CreateLibro($user, $libro)
-{
-    global $WSURI;
-	$wsRemotePath =  $WSURI . "/libri/screate.php";
+// Check for errors
+if ($response === false) {
+    // Handle cURL error or other issues
+    echo "Error occurred while making the request.";
+} else {
+    // Debugging: Echo out the response content
+    echo "Response content: " . $response;
 
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        ),
-        "object" => array(
-            "ID" => $libro->ID,
-            "ISBN" => $libro->ISBN,
-            "Autore" => $libro->Autore,
-            "Titolo" => $libro->Titolo,
-            "Prezzo" => $libro->Prezzo
-        )
-    );
+    // Decode the JSON response
+    $libro = json_decode($response, true);
 
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
-
-    $libro = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    // var_dump ($libro);
-
-    return $libro;
+    // Check if decoding was successful
+    if ($libro === null) {
+        // Handle JSON decoding error
+        echo "Error decoding JSON response.";
+    } else {
+        // Process the response as needed
+        var_dump($libro);
+    }
 }
+ */
 
-function ReadLibri($user, $ID = 0) 
-{
-    global $WSURI;
-    $wsRemotePath =  $WSURI . "/libri/sread.php";
-    if (is_numeric($ID) && $ID > 0)
-        $wsRemotePath .= "?id=".$ID;
-
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        )
-    );
-
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
-
-    $libri = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    //var_dump ($libri);
-
-    return $libri;
-}
-
-function UpdateLibro($user, $libro) //$ID, $isbn, $autore, $titolo, $prezzo)
-{
-    global $WSURI;
-	$wsRemotePath = $WSURI . "/libri/supdate.php";
-
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        ),
-        "object" => array(
-            "ID" => $libro->ID,
-            "ISBN" => $libro->ISBN,
-            "Autore" => $libro->Autore,
-            "Titolo" => $libro->Titolo,
-            "Prezzo" => $libro->Prezzo
-        )
-    );
-
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
-
-    $libro = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    // var_dump ($libro);
-
-    return $libro;
-}
-
-function DeleteLibro($user, $ID)
-{
-    global $WSURI;
-	$wsRemotePath = $WSURI . "/libri/sdelete.php?id=" . $ID;
-
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        )
-    );
-
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
-
-    $libro = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    // var_dump ($libro);
-
-    return $libro;
-}
-
-function SearchLibri($user, $isbn, $titolo, $ordinaper = "")
-{
-    global $WSURI;
-	$wsRemotePath = $WSURI . "/libri/ssearch.php";
-
-    $filtri = array(
-        "user" => array(
-            "Email" => $user->Email,
-            "Token" => $user->Token
-        ),
-        "object" => array(
-            "ISBN" => $isbn,
-            "Titolo" => $titolo,
-            "Ordinaper" => $ordinaper
-        )
-    ); // Case sensitive
-
-    $response = WsRequest($wsRemotePath, $filtri);
-    //var_dump($response); 
-
-    $libri = json_decode($response, true); // O per XML: $response = new SimpleXMLElement($response);
-    //var_dump ($libri);
-
-    return $libri;
-}
