@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $requestData = json_decode(file_get_contents('php://input'), true);
 
     if (isset($_SESSION["id_user_message"])) {
+        
         $utenteBL = new UtenteBL($conn);
         $result = json_decode($utenteBL->GetUserById($_SESSION["id_user_message"]), true); // Ensure true to get associative array
 
